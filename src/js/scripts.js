@@ -1,21 +1,65 @@
 const item = class {
-  constructor(name, prodTime, numOutItems, materials) {
+  constructor(name, prodTime, numOutItems, materials, israwMaterials) {
     this.name = name;
     this.prodTime = prodTime;
     this.numOutItems = numOutItems;
     this.materials =  materials;
+    this.israwMaterials = israwMaterials;
   }
-  getItemsPerSec() {
-    return 1 / this.prodTime
+  prodMult(factoryLevel = 1, ovenMult = 1) {
+    return this.isOre ? ovenMult : factoryProduction[factoryLevel];
   }
-  getMaterialPerSec() {
-    let itemsPerSec = this.getItemsPerSec();
-    for(let material in this.materials) {
+  getItemsPerSec(factoryNumbers = {
+    1: 1,
+    2: 0,
+    3: 0
+  }) {
+    let productivity = 0;
+    for (let level in factoryNumbers) {
+      productivity += factoryNumbers[level] * this.prodMult(level);
+    }
+    return (1 / this.prodTime) * productivity;
+  }
+  getMaterialPerSec(factoryNumbers) {
+    let itemsPerSec = this.getItemsPerSec(factoryNumbers);
+    let materialsPerSec = {};
+    for (let material in this.materials) {
       let currentMaterialPerSec = this.materials[material] * itemsPerSec;
-      return console.log(`${this.name} - ${itemsPerSec}/sec, Need: ${itemsLib[material].name} - ${currentMaterialPerSec}/sec`);
+      materialsPerSec[material] = currentMaterialPerSec;
+      //console.log(`${this.name} - ${itemsPerSec}/sec, Need: ${itemsLib[material].name} - ${currentMaterialPerSec}/sec`);
+    }
+    return materialsPerSec;
+  }
+  getFactoryNumbers(itemsPerSec = 1, factorysLevel = 1) {
+    let factoryNumbers = {
+      1: 0,
+      2: 0,
+      3: 0
+    }
+    let factorysNum = (itemsPerSec * this.prodTime) / this.prodMult(factorysLevel);
+    factoryNumbers[factorysLevel] = Math.ceil(factorysNum);
+    console.log(`${this.name} - ${itemsPerSec}/sec, Need: factorys ${factorysNum.toFixed(1)}/${Math.ceil(factorysNum)}`);
+    return factoryNumbers;
+  }
+  calcTechLine(itemsPerSec, factorysLevel) {
+    let factoryNumbers = this.getFactoryNumbers(itemsPerSec, factorysLevel);
+    let materials = this.getMaterialPerSec(factoryNumbers);
+    if (materials) {
+      for (let item in materials) {
+        itemsLib[item].calcTechLine(materials[item], factorysLevel);
+      }
     }
   }
 }
+
+const factoryProduction = {
+  1: 0.5,
+  2: 0.75,
+  3: 1.25
+}
+
+const meltingTime = 3.2;
+const extractionTime = 2;
 
 let itemsLib = {};
 
@@ -26,8 +70,8 @@ itemsLib.transportBelt = new item('transport belt', 0.5, 2, {
 itemsLib.ironGearWheel = new item('iron gear wheel', 0.5, 1, {
   ironPlate: 2
 });
-itemsLib.ironPlate = new item('iron plate', 3.2, 1, {
+itemsLib.ironPlate = new item('iron plate', meltingTime, 1, {
   ironOre: 1
-});
-itemsLib.ironOre = new item('iron ore', 2, 1, null);
+}, true);
+itemsLib.ironOre = new item('iron ore', extractionTime, 1, null, true);
 console.log(itemsLib);
