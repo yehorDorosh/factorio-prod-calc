@@ -43,13 +43,30 @@ const item = class {
   }
   calcTechLine(itemsPerSec, factorysLevel) {
     let factoryNumbers = this.getFactoryNumbers(itemsPerSec, factorysLevel);
+    allFactorys[this.name] = allFactorys[this.name] ?  objSum(allFactorys[this.name], factoryNumbers) : factoryNumbers;
     let materials = this.getMaterialPerSec(factoryNumbers);
     if (materials) {
       for (let item in materials) {
+        allMaterialsPerSec[item] = allMaterialsPerSec[item] ? allMaterialsPerSec[item] + materials[item] : materials[item];
         itemsLib[item].calcTechLine(materials[item], factorysLevel);
       }
     }
   }
+  run(itemsPerSec, factorysLevel) {
+    allMaterialsPerSec = {};
+    allFactorys = {};
+    this.calcTechLine(itemsPerSec, factorysLevel);
+    console.log(allMaterialsPerSec);
+    console.log(allFactorys);
+  }
+}
+
+const objSum = (objA, objB) => {
+  let obj = {};
+  Object.keys(objA).forEach(key => {
+    obj[key] = objA[key] + objB[key];
+  });
+  return obj;
 }
 
 const factoryProduction = {
@@ -57,10 +74,10 @@ const factoryProduction = {
   2: 0.75,
   3: 1.25
 }
-
 const meltingTime = 3.2;
 const extractionTime = 2;
-
+let allMaterialsPerSec = {};
+let allFactorys = {};
 let itemsLib = {};
 
 itemsLib.transportBelt = new item('transport belt', 0.5, 2, {
