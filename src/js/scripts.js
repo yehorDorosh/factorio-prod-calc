@@ -37,8 +37,8 @@ const item = class {
       3: 0
     }
     let factorysNum = (itemsPerSec * this.prodTime) / this.prodMult(factorysLevel);
-    factoryNumbers[factorysLevel] = Math.ceil(factorysNum);
-    console.log(`${this.name} - ${itemsPerSec}/sec, Need: factorys ${factorysNum.toFixed(1)}/${Math.ceil(factorysNum)}`);
+    factoryNumbers[factorysLevel] = Number(factorysNum.toFixed(2));
+    // console.log(`${this.name} - ${itemsPerSec}/sec, Need: factorys ${factorysNum.toFixed(1)}/${Math.ceil(factorysNum)}`);
     return factoryNumbers;
   }
   calcTechLine(itemsPerSec, factorysLevel) {
@@ -52,7 +52,7 @@ const item = class {
       }
     }
   }
-  run(itemsPerSec, factorysLevel) {
+  getResult(itemsPerSec, factorysLevel) {
     allMaterialsPerSec = {};
     allFactorys = {};
     this.calcTechLine(itemsPerSec, factorysLevel);
@@ -64,7 +64,7 @@ const item = class {
 const objSum = (objA, objB) => {
   let obj = {};
   Object.keys(objA).forEach(key => {
-    obj[key] = objA[key] + objB[key];
+    obj[key] = Number((objA[key] + objB[key]).toFixed(2));
   });
   return obj;
 }
