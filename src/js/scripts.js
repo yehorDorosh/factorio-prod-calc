@@ -4,10 +4,10 @@ const item = class {
     this.prodTime = prodTime;
     this.numOutItems = numOutItems;
     this.materials =  materials;
-    this.israwMaterials = israwMaterials;
+    this.isRawMaterials = israwMaterials;
   }
   prodMult(factoryLevel = 1, ovenMult = 1) {
-    return this.isOre ? ovenMult : factoryProduction[factoryLevel];
+    return this.isRawMaterials ? ovenMult : factoryProduction[factoryLevel];
   }
   getItemsPerSec(factoryNumbers = {
     1: 1,
@@ -75,10 +75,12 @@ const factoryProduction = {
   3: 1.25
 }
 const meltingTime = 3.2;
-const extractionTime = 2;
+const extractionTime = 1.428; // 2
 let allMaterialsPerSec = {};
 let allFactorys = {};
 let itemsLib = {};
+
+// LIB
 
 itemsLib.transportBelt = new item('transport belt', 0.5, 2, {
   ironGearWheel: 1,
@@ -91,4 +93,60 @@ itemsLib.ironPlate = new item('iron plate', meltingTime, 1, {
   ironOre: 1
 }, true);
 itemsLib.ironOre = new item('iron ore', extractionTime, 1, null, true);
-console.log(itemsLib);
+
+function addElem(parent, content, elem = 'DIV') {
+  let item = document.createElement(elem);
+  item.innerText = content;
+  parent.appendChild(item);
+}
+
+// Interface
+
+function forEachNodeList(nodeList, callBack) {
+  Array.prototype.forEach.call(nodeList, callBack);
+}
+
+const lib = document.getElementById('lib');
+const infoDisplay = document.getElementById('info');
+const fieldItemPerSec = document.getElementById('itemPerSec');
+const fieldFactoryLevel = document.getElementById('factoryLevel');
+let valueItemPerSec = 1;
+let valueFactoryLevel = 1;
+
+fieldItemPerSec.addEventListener('change', () => {
+  valueItemPerSec = fieldItemPerSec.value;
+});
+fieldFactoryLevel.addEventListener('change', () => {
+  valueFactoryLevel = fieldFactoryLevel.value;
+});
+
+
+for (let entity in itemsLib) {
+  addElem(lib, itemsLib[entity].name, 'LI');
+}
+
+const list = lib.querySelectorAll('li');
+
+document.addEventListener('click', e => {
+  forEachNodeList(list, elem => {
+    if (e.target === elem) {
+      for (let entity in itemsLib) {
+        if (itemsLib[entity].name === elem.innerText) {
+          itemsLib[entity].getResult(valueItemPerSec, valueFactoryLevel);
+          infoDisplay.innerHTML = '';
+          for (let material in  allMaterialsPerSec) {
+            let content = `${material} - ${allMaterialsPerSec[material]}`
+            addElem(infoDisplay, content);
+          }
+          for (let factoryObj in  allFactorys) {
+            addElem(infoDisplay, factoryObj);
+            for (let factoryLevel in allFactorys[factoryObj]) {
+              let content = `${factoryLevel} - ${allFactorys[factoryObj][factoryLevel]}`
+              addElem(infoDisplay, content);
+            }
+          }
+        }
+      }
+    }
+  });
+});
