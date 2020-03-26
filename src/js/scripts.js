@@ -1,13 +1,31 @@
 const item = class {
-  constructor(name, prodTime, numOutItems, materials, israwMaterials) {
+  constructor(name, prodTime, numOutItems, materials, type = 'item') {
     this.name = name;
     this.prodTime = prodTime;
     this.numOutItems = numOutItems;
     this.materials =  materials;
-    this.isRawMaterials = israwMaterials;
+    this.type = type;
   }
-  prodMult(factoryLevel = 1, ovenMult = 1) {
-    return this.isRawMaterials ? ovenMult : factoryProduction[factoryLevel];
+  prodMult(factoryLevel = 1, ovenMult = 1, meltingMult = 1, rawOilMult = 1) {
+    let multiplicator;
+    switch (this.type) {
+      case 'item':
+        multiplicator = factoryProduction[factoryLevel];
+        break;
+      case 'ore':
+        multiplicator = ovenMult;
+        break;
+      case 'melting':
+        multiplicator = meltingMult;
+        break;
+      case 'raw oil':
+        multiplicator = rawOilMult;
+        break;
+      default:
+        multiplicator = 1;
+        break;
+    }
+    return multiplicator;
   }
   getItemsPerSec(factoryNumbers = {
     1: 1,
@@ -75,7 +93,9 @@ const factoryProduction = {
   3: 1.25
 }
 const meltingTime = 3.2;
+const meltingTimeSteel = 16;
 const extractionTime = 1.428; // 2
+const extractionTimeUranium = extractionTime / 2;
 let allMaterialsPerSec = {};
 let allFactorys = {};
 let itemsLib = {};
@@ -91,8 +111,19 @@ itemsLib.ironGearWheel = new item('iron gear wheel', 0.5, 1, {
 });
 itemsLib.ironPlate = new item('iron plate', meltingTime, 1, {
   ironOre: 1
-}, true);
-itemsLib.ironOre = new item('iron ore', extractionTime, 1, null, true);
+}, 'melting');
+itemsLib.copperPlate = new item('copper plate', meltingTime, 1, {
+  copperOre: 1
+}, 'melting');
+itemsLib.steelPlate = new item('steel plate', meltingTimeSteel, 1, {
+  ironPlate: 5
+}, 'melting');
+itemsLib.ironOre = new item('iron ore', extractionTime, 1, null, 'ore');
+itemsLib.coal = new item('coal', extractionTime, 1, null, 'ore');
+itemsLib.copperOre = new item('copper ore', extractionTime, 1, null, 'ore');
+itemsLib.stone = new item('stone', extractionTime, 1, null, 'ore');
+itemsLib.uraniumOre = new item('uranium Ore', extractionTimeUranium, 1, null, 'ore');
+itemsLib.crudeOil = new item('crude oil', 0.5, 1, null, 'raw oil');
 
 function addElem(parent, content, elem = 'DIV') {
   let item = document.createElement(elem);
