@@ -101,14 +101,13 @@ let allFactorys = {};
 let itemsLib = {};
 
 // LIB
-
-itemsLib.transportBelt = new item('transport belt', 0.5, 2, {
-  ironGearWheel: 1,
-  ironPlate: 1
-});
-itemsLib.ironGearWheel = new item('iron gear wheel', 0.5, 1, {
-  ironPlate: 2
-});
+itemsLib.wood = new item('wood', 1, 1, null, 'wood');
+itemsLib.ironOre = new item('iron ore', extractionTime, 1, null, 'ore');
+itemsLib.coal = new item('coal', extractionTime, 1, null, 'ore');
+itemsLib.copperOre = new item('copper ore', extractionTime, 1, null, 'ore');
+itemsLib.stone = new item('stone', extractionTime, 1, null, 'ore');
+itemsLib.uraniumOre = new item('uranium Ore', extractionTimeUranium, 1, null, 'ore');
+itemsLib.crudeOil = new item('crude oil', 0.5, 1, null, 'raw oil');
 itemsLib.ironPlate = new item('iron plate', meltingTime, 1, {
   ironOre: 1
 }, 'melting');
@@ -118,12 +117,94 @@ itemsLib.copperPlate = new item('copper plate', meltingTime, 1, {
 itemsLib.steelPlate = new item('steel plate', meltingTimeSteel, 1, {
   ironPlate: 5
 }, 'melting');
-itemsLib.ironOre = new item('iron ore', extractionTime, 1, null, 'ore');
-itemsLib.coal = new item('coal', extractionTime, 1, null, 'ore');
-itemsLib.copperOre = new item('copper ore', extractionTime, 1, null, 'ore');
-itemsLib.stone = new item('stone', extractionTime, 1, null, 'ore');
-itemsLib.uraniumOre = new item('uranium Ore', extractionTimeUranium, 1, null, 'ore');
-itemsLib.crudeOil = new item('crude oil', 0.5, 1, null, 'raw oil');
+itemsLib.ironGearWheel = new item('iron gear wheel', 0.5, 1, {
+  ironPlate: 2
+});
+itemsLib.ironStick = new item('iron stick', 0.5, 2, {
+  ironPlate: 1
+});
+itemsLib.copperCable = new item('copper cable', 0.5, 2, {
+  copperPlate: 1
+});
+itemsLib.ironChest = new item('iron chest', 0.5, 1, {
+  ironPlate: 8
+});
+itemsLib.steelChest = new item('steel chest', 0.5, 1, {
+  steelPlate: 8
+});
+itemsLib.storageTank = new item('steel chest', 3, 1, {
+  ironPlate: 20,
+  steelPlate: 5
+});
+itemsLib.firearmMagazine = new item('firearm magazine', 1, 1, {
+  ironPlate: 4
+});
+itemsLib.piercingRoundsMagazine = new item('piercing rounds magazine', 3, 1, {
+  copperPlate: 5,
+  firearmMagazine: 1,
+  steelPlate: 1,
+});
+itemsLib.electronicCircuit = new item('electronic circuit', 0.5, 1, {
+  copperCable: 3,
+  ironPlate: 1
+});
+itemsLib.transportBelt = new item('transport belt', 0.5, 2, {
+  ironGearWheel: 1,
+  ironPlate: 1
+});
+itemsLib.fastTransportBelt = new item('fast transport belt', 0.5, 1, {
+  ironGearWheel: 5,
+  transportBelt: 1
+});
+itemsLib.undergroundBelt = new item('underground belt', 1, 2, {
+  ironPlate: 10,
+  transportBelt: 5
+});
+itemsLib.fastUndergroundBelt = new item('fast underground belt', 2, 2, {
+  ironGearWheel: 40,
+  undergroundBelt: 2
+});
+itemsLib.splitter = new item('splitter', 1, 1, {
+  electronicCircuit: 5,
+  ironPlate: 5,
+  transportBelt: 4
+});
+itemsLib.fastSplitter = new item('fast splitter', 2, 1, {
+  electronicCircuit: 10,
+  ironGearWheel: 10,
+  splitter: 1
+});
+itemsLib.inserter = new item('inserter', 0.5, 1, {
+  electronicCircuit: 1,
+  ironGearWheel: 1,
+  ironPlate: 1
+});
+itemsLib.longHandedInserter = new item('long handed inserter', 0.5, 1, {
+  inserter: 1,
+  ironGearWheel: 1,
+  ironPlate: 1
+});
+itemsLib.fastInserter = new item('fast inserter', 0.5, 1, {
+  inserter: 1,
+  electronicCircuit: 2,
+  ironPlate: 1
+});
+itemsLib.filterInserter = new item('filter inserter', 0.5, 1, {
+  fastInserter: 1,
+  electronicCircuit: 4,
+});
+itemsLib.smallElectricPole = new item('small electric pole', 0.5, 2, {
+  copperCable: 2,
+  wood: 1
+});
+itemsLib.automationSciencePack = new item('automation science pack', 5, 1, {
+  copperPlate: 1,
+  ironGearWheel: 1
+});
+itemsLib.logisticSciencePack = new item('logistic science pack', 6, 1, {
+  inserter: 1,
+  transportBelt: 1
+});
 
 function addElem(parent, content, elem = 'DIV') {
   let item = document.createElement(elem);
@@ -166,10 +247,12 @@ document.addEventListener('click', e => {
           itemsLib[entity].getResult(valueItemPerSec, valueFactoryLevel);
           infoDisplay.innerHTML = '';
           for (let material in  allMaterialsPerSec) {
-            let content = `${material} - ${allMaterialsPerSec[material]}`
+            // rendering materials list
+            let content = `${itemsLib[material].name} - ${allMaterialsPerSec[material]}`
             addElem(infoDisplay, content);
           }
           for (let factoryObj in  allFactorys) {
+            // renedering factorys list
             addElem(infoDisplay, factoryObj);
             for (let factoryLevel in allFactorys[factoryObj]) {
               let content = `${factoryLevel} - ${allFactorys[factoryObj][factoryLevel]}`
